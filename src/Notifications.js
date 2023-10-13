@@ -16,7 +16,7 @@ const Notifications = () => {
 
   useEffect(() => {
     if (!listening) {
-      eventSource = new EventSource("http://localhost:8080/notify");
+      eventSource = new EventSource("http://localhost:8081/notify");
 
       eventSource.onopen = (event) => {
         console.log("connection opened");
