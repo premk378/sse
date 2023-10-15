@@ -6,18 +6,18 @@ import {
   AccordionPanel,
   AccordionIcon,
   Box,
+  Flex,
 } from "@chakra-ui/react";
+import fileImg from "./assets/file.png";
 import FileStatus from "./FileStatus";
 import { useDispatch, useSelector } from "react-redux";
 import { addFileEvent } from "./filesSlice";
 
 const NotificationsAdvanced = () => {
-  const files = useSelector(state => state.files);
+  const files = useSelector((state) => state.files);
   const dispatch = useDispatch();
   const [listening, setListening] = useState(false);
-  // const [data, setData] = useState([]);
   let eventSource = undefined;
-
 
   useEffect(() => {
     if (!listening) {
@@ -30,7 +30,7 @@ const NotificationsAdvanced = () => {
       eventSource.onmessage = (event) => {
         if (event.data) {
           const parsed = JSON.parse(event.data);
-          dispatch(addFileEvent({id: parsed.id, ev: parsed}));
+          dispatch(addFileEvent({ id: parsed.id, ev: parsed }));
         }
       };
 
@@ -51,37 +51,35 @@ const NotificationsAdvanced = () => {
     };
   }, []);
 
+  const getFileSize = (bytes) => {
+    return Math.round(bytes/1024) + ' KB';
+  }
   return (
     <div className="table-container">
-      <Accordion
-        defaultIndex={[]}
-        allowMultiple
-        w="80%"
+      {!files?.length && <Box textAlign='center' mt='10px' fontSize='18px'>No files uploaded</Box>}
+      {files?.length > 0 && <Accordion
+        w="90%"
         border="1px solid #eee"
         borderRadius="8px"
+        allowToggle
       >
-        <AccordionItem>
-          <h2>
-            <AccordionButton>
-              <Box as="span" flex="1" textAlign="left">
-                Section 1 title
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel pb={4}>
-            <FileStatus></FileStatus>
-          </AccordionPanel>
-        </AccordionItem>
         {files &&
           files.map((file) => {
             return (
               <AccordionItem key={file.id}>
                 <h2>
                   <AccordionButton>
-                    <Box as="span" flex="1" textAlign="left">
-                      {file.filename}
-                    </Box>
+                    <Flex as='span' flex='1' alignItems='center'>
+                      <img height='50' width='50' src={fileImg}></img>
+                      <Box as="span" flex="1" textAlign="left">
+                      <Box fontSize='13px' fontWeight='bold'>{file.filename}</Box>
+                      <Box fontSize='11px' color='#555'>{getFileSize(file.size)}</Box>
+                    </Box> 
+                    </Flex>
+                    {/* <Box as="span" flex="1" textAlign="left">
+                      <Box>{file.filename}</Box>
+                      <Box>200 KB</Box>
+                    </Box> */}
                     <AccordionIcon />
                   </AccordionButton>
                 </h2>
@@ -91,7 +89,7 @@ const NotificationsAdvanced = () => {
               </AccordionItem>
             );
           })}
-      </Accordion>
+      </Accordion>}
     </div>
   );
 };

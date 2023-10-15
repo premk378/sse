@@ -10,17 +10,12 @@ const filesSlice = createSlice({
       return [...files, action.payload];
     },
     addFileEvent: (files, action) => {
-      console.log(action.payload)
-      const updated = [...files].map((file) => {
+      files.forEach((file) => {
         if (file.id === action.payload.id) {
-          file.events = [...file.events, action.payload.event];
-          return file;
-        } else {
-          return file;
+          file.events.push(action.payload.ev)
         }
       });
-      console.log(updated);
-      return updated;
+      return files;
     },
   },
 });
