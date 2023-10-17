@@ -12,6 +12,7 @@ import fileImg from "./assets/file.png";
 import FileStatus from "./FileStatus";
 import { useDispatch, useSelector } from "react-redux";
 import { addFileEvent } from "./filesSlice";
+import { HOSTNAME, NOTIFY_API } from "./constants";
 
 const NotificationsAdvanced = () => {
   const files = useSelector((state) => state.files);
@@ -21,7 +22,7 @@ const NotificationsAdvanced = () => {
 
   useEffect(() => {
     if (!listening) {
-      eventSource = new EventSource("http://localhost:8081/notify");
+      eventSource = new EventSource(HOSTNAME + NOTIFY_API);
 
       eventSource.onopen = (event) => {
         console.log("connection opened");
@@ -30,7 +31,16 @@ const NotificationsAdvanced = () => {
       eventSource.onmessage = (event) => {
         if (event.data) {
           const parsed = JSON.parse(event.data);
-          dispatch(addFileEvent({ id: parsed.id, ev: parsed }));
+          console.log(parsed);
+          let message = null;
+          if(parsed.fileStatus === 'scan-start') {
+            message = "Scan Started";
+          } else if(parsed.fileStatus === 'complete') {
+            message = "Scan Finished"
+          } else {
+            message = parsed.subject;
+          }
+          dispatch(addFileEvent({ id: parsed.id, ev: {...parsed, message: message} }));
         }
       };
 
@@ -56,7 +66,7 @@ const NotificationsAdvanced = () => {
   }
   return (
     <div className="table-container">
-      {!files?.length && <Box textAlign='center' mt='10px' fontSize='18px'>No files uploaded</Box>}
+      {!files?.length && <Box textAlign='center' mt='10px' fontSize='18px' fontWeight='600'>No files uploaded</Box>}
       {files?.length > 0 && <Accordion
         w="90%"
         border="1px solid #eee"
@@ -76,10 +86,6 @@ const NotificationsAdvanced = () => {
                       <Box fontSize='11px' color='#555'>{getFileSize(file.size)}</Box>
                     </Box> 
                     </Flex>
-                    {/* <Box as="span" flex="1" textAlign="left">
-                      <Box>{file.filename}</Box>
-                      <Box>200 KB</Box>
-                    </Box> */}
                     <AccordionIcon />
                   </AccordionButton>
                 </h2>

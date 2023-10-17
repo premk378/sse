@@ -11,7 +11,7 @@ const filesSlice = createSlice({
     },
     addFileEvent: (files, action) => {
       files.forEach((file) => {
-        if (file.id === action.payload.id) {
+        if (file.id == action.payload.id) {
           file.events.push(action.payload.ev)
         }
       });
